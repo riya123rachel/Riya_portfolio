@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Friend Portfolio</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet"href="style.css">
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="logo.jpg" alt="Logo">
+        </div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#interest">Interests</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+</header>
+<section id="home">
+    <h1>Hello, I’m Riya Rachel</h1>
+    <p>A creative learner who likes to create, design, make content and webpages.</p>
+    <div class="profile-img">
+        <img src="profile.jpg" alt="Profile">
+    </div>
+    <a href="cv.pdf" class="cv-btn">
+        <i class="fas fa-download"></i> Download CV
+    </a>
+</section>
+<section id="about">
+    <div class="about-box">
+        <h2>About Me</h2>
+        <p>
+            I'm Riya, a creative enthusiast who likes content creation, creative writing, and webpage designing. I blend storytelling with visual appeal to craft engaging digital experiences. Constantly exploring design trends and innovative ideas, I aim to deliver impactful content and user-friendly interfaces.
+        </p>
+    </div>
+    <div class="about-box">
+        <h2>Skills</h2>
+        <p>
+            Creative writing, Designing web pages, Content creation, Music, Sketching
+        </p>
+    </div>
+</section>
+<section id="interest">
+    <h1>My Interests</h1>
+    <div class="interest-cards">
+        <div class="interest-card">
+            <img src="music.jpg">
+            <div class="card-content">
+                <h3>Music</h3>
+                <p>Building modern, scalable, and interactive websites.</p>
+            </div>
+        </div>
+        <div class="interest-card">
+            <img src="content.jpg">
+            <div class="card-content">
+                <h3>Content Creation</h3>
+                <p>Designing intuitive and visually appealing user interfaces.</p>
+            </div>
+        </div>
+        <div class="interest-card">
+            <img src="sketch.jpg">
+            <div class="card-content">
+                <h3>Sketching</h3>
+                <p>Designing intuitive and visually appealing user interfaces.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="contact">
+    <div class="contact-form">
+        <h1>Contact Me</h1>
+        <form id="contactForm">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <textarea rows="6" name="message" placeholder="Your Message" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+    <div class="contact-info">
+        <h3>Get in touch</h3>
+        <p id="email"><i class="fas fa-envelope"></i> email@example.com</p>
+        <p><i class="fab fa-instagram"></i> @yourusername</p>
+        <p id="phone"><i class="fas fa-phone"></i> +123 456 7890</p>
+    </div>
+</section>
+<footer>
+© 2026 Portfolio | Designed by Riya Rachel
+<div class="footer-social">
+    <a href="https://www.instagram.com/yourusername" target="_blank"><i class="fab fa-instagram"></i></a>
+    <a href="mailto:yourname@example.com"><i class="fas fa-envelope"></i></a>
+</div>
+</footer>
+<script>
+const sections=document.querySelectorAll("section");
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add("show");
+    }
+  });
+},{threshold:0.2});
+sections.forEach(sec=>observer.observe(sec));
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+import { getFirestore, collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC8p82cmlFQqzVAhGsTRqFo3kY3aBWcwnA",
+  authDomain: "rhea-portfolio.firebaseapp.com",
+  projectId: "rhea-portfolio",
+  storageBucket: "rhea-portfolio.firebasestorage.app",
+  messagingSenderId: "535287460758",
+  appId: "1:535287460758:web:f989ff1cbeb9bef72863b7",
+  measurementId: "G-DBHNM2RJTT"
+};
+
+const app = initializeApp(firebaseConfig);
+getAnalytics(app);
+const db = getFirestore(app);
+
+// Load portfolio data
+async function loadPortfolioData(){
+  const snap = await getDoc(doc(db,"portfolio","portfolio-dtls"));
+  if(!snap.exists()) return;
+
+  const data = snap.data();
+  document.querySelector("#home h1").innerText = data.name;
+  document.querySelector("#home p").innerText = data.role;
+  document.querySelectorAll("#about p")[0].innerText = data.about;
+  if(data.skills) document.querySelectorAll("#about p")[1].innerText = data.skills;
+  document.getElementById("email").innerHTML =
+    `<i class="fas fa-envelope"></i> ${data.email}`;
+  document.getElementById("phone").innerHTML =
+    `<i class="fas fa-phone"></i> ${data.phoneno}`;
+}
+loadPortfolioData();
+
+// Contact form
+document.getElementById("contactForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const form=e.target;
+  await addDoc(collection(db,"messages"),{
+    name:form.name.value,
+    email:form.email.value,
+    message:form.message.value,
+    createdAt:new Date()
+  });
+  alert("Message sent successfully ✅");
+  form.reset();
+});
+</script>
+</body>
+</html>
